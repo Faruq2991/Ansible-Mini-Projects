@@ -2,7 +2,7 @@
 
 I learned some basic yet very important concepts of Ansible from executing this mini project:
 
-- Project: Set up Ansible on your local machine and create an inventory file. [x]
+- Project: Set up Ansible on your local machine and create an inventory file.
 - Goals of the project:
  - Install Ansible. 
  - Create a basic inventory file with at least two different hosts.

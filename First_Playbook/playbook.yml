@@ -1,0 +1,85 @@
+- hosts: all
+  name: Setting up webserver
+  become: true
+  tasks:
+    - name: Update index repository (Ubuntu)
+      apt:
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update index repository (CentOS)
+      dnf:
+        name: "*"
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+
+- hosts: all
+  name: Setup nginx server
+  become: true
+  tasks:
+
+    - name: install apache2 on Ubuntu webserver
+      apt: 
+        name: apache2
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: start apache2 service (Ubuntu)
+      service: 
+        name: apache2
+        state: started
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Enable apache2 service (Ubuntu)
+      service:
+        name: apache2
+        enabled: yes
+      when: ansible_distribution == "Ubuntu"
+
+
+    - name: Configure apache2 to listen on port 80 (Ubuntu)
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: 'Listen 80'
+        line: 'Listen 80'
+      notify: restart apache2
+      when: ansible_distribution == "Ubuntu"
+
+
+    - name: Install latest version of nginx on Ubuntu
+      apt:
+        name: nginx
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Install latest version of nginx on Amazon Linux
+      yum:
+        name: nginx
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable nginx service
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Configure nginx to listen on port 8080
+      lineinfile:
+        path: /etc/nginx/sites-available/default
+        regexp: 'listen 80 default_server;'
+        line: 'listen 8080 default_server;'
+      notify: restart nginx
+      when: ansible_distribution in ["Ubuntu", "Debian"]
+
+    - name: Get nginx installed version
+      command: nginx -v
+
+    - name: Get status of nginx service
+      command: systemctl status nginx
+
