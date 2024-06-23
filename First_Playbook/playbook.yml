@@ -15,7 +15,7 @@
 
 
 - hosts: all
-  name: Setup nginx server
+  name: Install and setup apache2 server
   become: true
   tasks:
 
@@ -46,40 +46,16 @@
       notify: restart apache2
       when: ansible_distribution == "Ubuntu"
 
-
-    - name: Install latest version of nginx on Ubuntu
-      apt:
-        name: nginx
-        state: latest
+    - name: Setup Website 
+      copy:
+        src: ./default_html_file.html
+        dest: /var/www/html/index.html
       when: ansible_distribution == "Ubuntu"
 
-    - name: Install latest version of nginx on Amazon Linux
-      yum:
-        name: nginx
-        state: latest
-      when: ansible_distribution == "CentOS"
-
-    - name: Start nginx service
+  handlers:
+    - name: restart apache2
       service:
-        name: nginx
-        state: started
-
-    - name: Enable nginx service
-      service:
-        name: nginx
+        name: apache
+        state: restarted
         enabled: yes
-
-    - name: Configure nginx to listen on port 8080
-      lineinfile:
-        path: /etc/nginx/sites-available/default
-        regexp: 'listen 80 default_server;'
-        line: 'listen 8080 default_server;'
-      notify: restart nginx
-      when: ansible_distribution in ["Ubuntu", "Debian"]
-
-    - name: Get nginx installed version
-      command: nginx -v
-
-    - name: Get status of nginx service
-      command: systemctl status nginx
 
