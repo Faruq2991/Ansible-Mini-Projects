@@ -26,6 +26,19 @@
         group: devops
         append: true
 
+    - name: Adding ssh keys for user
+      authorized_key:
+        user: mandzukic
+        key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPD8iwRjB2RIULC/j4b+4TRgAz4PSzofGNAeTj4BB+8T ansible"
+
+    - name: add sudoers file for mandzukic
+      copy:
+        src: mandzukic_sudoer
+        dest: /etc/sudoers.d/mandzukic
+        owner: mandzukic
+        group: devops
+        mode: 0442
+
     - name: Install and start Apache2 on Ubuntu webserver
       apt:
         name: apache2
