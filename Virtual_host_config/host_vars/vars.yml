@@ -1,0 +1,5 @@
+---
+server_name: www.example.com
+document_root: /var/www/example
+log_dir: /var/log/apache2
+

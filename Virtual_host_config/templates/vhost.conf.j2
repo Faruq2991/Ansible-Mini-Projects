@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName {{ server_name }}
+    DocumentRoot {{ document_root }}
+    
+    ErrorLog {{ log_dir }}/{{ server_name }}_error.log
+    CustomLog {{ log_dir }}/{{ server_name }}_access.log combined
+</VirtualHost>
+
