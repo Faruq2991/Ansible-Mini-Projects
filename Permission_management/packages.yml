@@ -18,7 +18,7 @@
         name: devops
         state: present
 
-    - name: Creating a user [mandzukic]
+    - name: Creating a user [Mandzukic]
       user: 
         name: mandzukic
         shell: /bin/bash
