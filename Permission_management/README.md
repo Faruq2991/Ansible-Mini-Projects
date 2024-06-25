@@ -1,14 +1,13 @@
-# Package Management
+# User and Permission Management
 
 ## Overview
-With this project I practiced how to install multiple software packages w/ Ansible
+Automate user creation and permission management.
+
 - Goals
-  - Create a playbook that installs multiple software packages.
-  - Ensure the packages are installed just once.
+  - Create users and groups on remote hosts.
+  - Create users and groups on remote hosts.
+  - Ensure users are present or absent as required.
+
 - Skills Learned:
-  - Playbook basics.
-  - Task Management.
-  - Idempotency
-  - Handlers.
-  - Package Management
-  - Use of Loops
+  - User management
+  - security
