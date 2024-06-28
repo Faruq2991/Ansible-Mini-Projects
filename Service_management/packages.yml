@@ -1,0 +1,65 @@
+- hosts: all
+  become: true
+  pre_tasks:
+
+    - name: Update index repository (Ubuntu)
+      apt:
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Update index repository (CentOS)
+      dnf:
+        name: "*"
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: Install and start Apache2 on Ubuntu webserver
+      apt:
+        name: apache2
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Ensure Apache2 is started and enabled (Ubuntu)
+      service:
+        name: apache2
+        state: started
+        enabled: true
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Using Loop to install multiple packages
+      apt:
+        name: "{{ item }}"
+        state: latest
+      loop: 
+        - git
+        - wget
+        - npm
+        - tree
+        - htop
+      when: ansible_distribution == "Ubuntu"
+- hosts: all
+  become: true
+  roles: 
+    - base
+
+- hosts: workstation
+  become: true
+  roles:
+    - workstation
+
+- hosts: webservers
+  become: true
+  roles:
+    - webservers
+
+- hosts: fileserver
+  become: true
+  roles:
+    - fileserver
+
+- hosts: dbservers
+  become: true
+  roles:
+    - dbserver
+
+

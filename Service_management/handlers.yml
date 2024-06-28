@@ -1,0 +1,12 @@
+- handlers:
+  - name: Reload Apache
+    service:
+      name: apache2
+      state: reloaded
+  - name: restart apache2
+    service:
+      name: apache
+      state: restarted
+      enabled: yes
+
+

@@ -1,0 +1,127 @@
+- name: install httpd package (CentOS)
+  tags: apache,centos,httpd
+  yum:
+    name: 
+      - httpd
+      - php
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: start and enable httpd (CentOS)
+  tags: apache,httpd,centos
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+  when: ansible_distribution == "CentOS"
+
+- name: install apache2 package (Ubuntu)
+  tags: apache,apache2,ubuntu
+  apt:
+    name: 
+      - apache2
+      - libapache2-mod-php
+    state: latest
+  when: ansible_distribution == "CentOS"
+
+- name: install apache2 on Ubuntu webserver
+  apt:
+    name: apache2
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: start apache2 service (Ubuntu)
+  service:
+    name: apache2
+    state: started
+  when: ansible_distribution == "Ubuntu"
+
+- name: Enable apache2 service (Ubuntu)
+  service:
+    name: apache2
+    enabled: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Configure apache2 to listen on port 80 (Ubuntu)
+  lineinfile:
+    path: /etc/apache2/ports.conf
+    regexp: 'Listen 80'
+    line: 'Listen 80'
+  notify: Reload Apache
+  when: ansible_distribution == "Ubuntu"
+
+- name: Ensure the files directory exists
+  file:
+    path: ./files
+    state: directory
+    mode: '0755'
+
+- name: Download dummy website
+  get_url:
+    url: https://www.tooplate.com/zip-templates/2137_barista_cafe.zip
+    dest: ./files/2137_barista_cafe.zip
+    mode: '0755'
+
+- name: installing unzip
+  apt:
+    name: unzip
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: unzipping
+  unarchive:
+    src: ./files/2137_barista_cafe.zip
+    dest: ./files
+    remote_src: true
+  when: ansible_distribution == "Ubuntu"
+
+- name: copy contents
+  copy:
+    src: ./files/2137_barista_cafe/
+    dest: /var/www/cafe
+    remote_src: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Create document root directory
+  file:
+    path: /var/www/cafe
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  when: ansible_distribution == "Ubuntu"
+
+- name: Deploy Apache virtual host configuration
+  template:
+    src: vhost.conf.j2
+    dest: /etc/apache2/sites-available/ www.cafe.com.conf
+  when: ansible_distribution == "Ubuntu"
+
+- name: Enable the new virtual host
+  command: a2ensite www.cafe.com.conf
+  notify: Reload Apache
+  when: ansible_distribution == "Ubuntu"
+
+- name: Disable default site
+  command: a2dissite 000-default.conf
+  notify: Reload Apache
+  when: ansible_distribution == "Ubuntu"
+
+- name: Validate Apache configuration
+  command: apache2ctl configtest
+  register: apache_configtest
+  when: ansible_distribution == "Ubuntu"
+
+- name: Set ServerName globally
+  lineinfile:
+    path: /etc/apache2/apache2.conf
+    regexp: '^#?ServerName'
+    line: 'ServerName www.cafe.com'
+    state: present
+  notify: Reload Apache
+  when: ansible_distribution == "Ubuntu"
+
+- name: Clean up unzipped folder
+  file:
+    path: ./files/2137_barista_cafe.zip
+    state: absent
